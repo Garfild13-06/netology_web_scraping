@@ -1,10 +1,7 @@
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
-from pprint import pprint
 
 
 def wait_element(driver, delay_seconds=1, by=By.TAG_NAME, value=None):
@@ -24,16 +21,13 @@ def wait_element(driver, delay_seconds=1, by=By.TAG_NAME, value=None):
     )
 
 
-# service = Service(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome()
 print(driver, driver.caps["browserVersion"])
-
-url = "https://habr.com/ru/all/"
-driver.get(url)
-
+driver.get("https://habr.com/ru/all/")
 articles = driver.find_element(By.CLASS_NAME, 'tm-articles-list')
 
-parced_data = []
+parsed_data = []
+all_element = articles.find_elements(By.CLASS_NAME, 'article')
 for article in articles.find_elements(By.CLASS_NAME, 'article'):
     h2_element = article.find_element(By.TAG_NAME, 'h2')
     a_element = h2_element.find_element(By.TAG_NAME, 'a')
@@ -44,15 +38,15 @@ for article in articles.find_elements(By.CLASS_NAME, 'article'):
     link = a_element.get_attribute('href')
     date_time = time_element.get_attribute('datetime')
 
-    parced_data.append({
+    parsed_data.append({
         'title': title,
         'link': link,
         'datetime': date_time
     })
 
-for item in parced_data:
+for item in parsed_data:
     driver.get(item['link'])
     article = wait_element(driver, by=By.ID, value='post-content-body')
     item['text'] = article.text
 
-pprint(parced_data)
+# pprint(parsed_data)
